@@ -1685,6 +1685,355 @@ body::before {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ============ NEW: CHAT PANEL — "talk to Hub" ============ */
+
+.chat-dock {
+  position: fixed;
+  bottom: 22px; right: 24px;
+  width: 408px;
+  max-width: calc(100vw - 48px);
+  z-index: 90;
+  display: flex; flex-direction: column;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 18px;
+  box-shadow:
+    0 18px 48px rgba(55, 104, 240, 0.18),
+    0 4px 14px rgba(39, 37, 37, 0.10),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.chat-dock.collapsed .chat-body { display: none; }
+.chat-dock.collapsed { border-radius: 999px; }
+.chat-dock.collapsed .chat-head { padding: 10px 12px 10px 18px; }
+.chat-dock.collapsed .chat-form { display: none; }
+.chat-dock.collapsed .chat-cta {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--hh-text);
+}
+.chat-dock.collapsed .chat-cta-sub {
+  font-family: "Caveat", cursive;
+  font-weight: 600;
+  color: var(--hh-blue);
+  font-size: 16px;
+  margin-left: 4px;
+}
+.chat-dock:not(.collapsed) .chat-cta { display: none; }
+
+.chat-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 14px 14px 18px;
+  border-bottom: 1px solid rgba(39, 37, 37, 0.06);
+}
+.chat-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.chat-mark {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--hh-blue) 0%, #5B82FF 50%, var(--hh-cyan) 100%);
+  box-shadow: 0 2px 8px rgba(55, 104, 240, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  position: relative;
+}
+.chat-mark::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+.chat-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--hh-text);
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+}
+.chat-title em {
+  font-style: normal;
+  color: var(--hh-blue);
+}
+.chat-sub {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--hh-text-faint);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.chat-toggle {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: var(--hh-text-dim);
+  transition: all 0.15s;
+}
+.chat-toggle:hover { color: var(--hh-blue); background: var(--hh-blue-soft); border-color: var(--hh-blue-soft); }
+
+.chat-body {
+  display: flex; flex-direction: column;
+  height: 440px;
+}
+.chat-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 18px 8px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.chat-stream::-webkit-scrollbar { width: 5px; }
+.chat-stream::-webkit-scrollbar-thumb { background: rgba(39, 37, 37, 0.10); border-radius: 3px; }
+
+.chat-msg {
+  max-width: 86%;
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-weight: 500;
+  animation: msgIn 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-msg.you {
+  align-self: flex-end;
+  background: var(--hh-blue);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 14px 14px 4px 14px;
+  box-shadow: 0 4px 14px rgba(55, 104, 240, 0.22);
+}
+.chat-msg.you strong { color: var(--hh-cyan); font-weight: 700; }
+.chat-msg.ai {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--hh-text);
+  padding: 10px 14px;
+  border-radius: 14px 14px 14px 4px;
+  border: 1px solid rgba(39, 37, 37, 0.05);
+  box-shadow: 0 2px 8px rgba(39, 37, 37, 0.04);
+}
+.chat-msg.ai strong { color: var(--hh-blue); font-weight: 700; }
+
+.chat-action {
+  align-self: flex-start;
+  max-width: 86%;
+  background: rgba(74, 156, 140, 0.10);
+  border: 1px dashed rgba(74, 156, 140, 0.35);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--hh-teal-dark);
+  display: flex; align-items: center; gap: 8px;
+  animation: msgIn 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.chat-action::before {
+  content: "✓";
+  font-weight: 700;
+  color: var(--hh-teal-dark);
+}
+.chat-action strong { color: var(--hh-text); font-weight: 700; }
+
+.chat-form {
+  display: flex; gap: 8px;
+  padding: 12px 14px 14px;
+  border-top: 1px solid rgba(39, 37, 37, 0.06);
+  background: rgba(255, 255, 255, 0.35);
+}
+.chat-input {
+  flex: 1;
+  background: var(--hh-card-bg);
+  border: 1px solid rgba(39, 37, 37, 0.08);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--hh-text);
+  outline: none;
+  transition: all 0.15s;
+}
+.chat-input:focus {
+  border-color: var(--hh-blue);
+  box-shadow: 0 0 0 3px var(--hh-blue-soft);
+}
+.chat-input::placeholder { color: var(--hh-text-faint); font-weight: 400; }
+.chat-send {
+  background: var(--hh-blue);
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: grid; place-items: center;
+  box-shadow: 0 4px 12px rgba(55, 104, 240, 0.30);
+  transition: all 0.15s;
+}
+.chat-send:hover { background: #2D58D8; transform: translateY(-1px); }
+.chat-send:active { transform: translateY(0); }
+
+/* ===== Voice ===== */
+
+.voice-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--hh-border-strong);
+  background: var(--hh-card-bg);
+  color: var(--hh-text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-right: 6px;
+}
+.voice-pill::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--hh-text-faint);
+  transition: all 0.15s;
+}
+.voice-pill:hover { color: var(--hh-text); border-color: var(--hh-text-dim); }
+.voice-pill.on {
+  background: var(--hh-blue);
+  color: white;
+  border-color: var(--hh-blue);
+  box-shadow: 0 4px 14px rgba(55, 104, 240, 0.30);
+}
+.voice-pill.on::before {
+  background: var(--hh-cyan);
+  box-shadow: 0 0 8px var(--hh-cyan);
+}
+
+.chat-mic {
+  background: transparent;
+  border: 1.5px solid var(--hh-border-strong);
+  color: var(--hh-text-dim);
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: grid; place-items: center;
+  transition: all 0.18s;
+  position: relative;
+}
+.chat-mic:hover { color: var(--hh-blue); border-color: var(--hh-blue); }
+.chat-mic.listening {
+  background: linear-gradient(135deg, var(--hh-rose), #E63E5C);
+  color: white;
+  border-color: var(--hh-rose);
+  animation: micPulse 1.4s ease-in-out infinite;
+}
+.chat-mic.listening::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 16px;
+  border: 2px solid var(--hh-rose);
+  opacity: 0.5;
+  animation: micRing 1.4s ease-out infinite;
+}
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 75, 90, 0.45), 0 4px 14px rgba(200, 75, 90, 0.30); }
+  50% { box-shadow: 0 0 0 6px rgba(200, 75, 90, 0), 0 4px 14px rgba(200, 75, 90, 0.30); }
+}
+@keyframes micRing {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+.chat-mic.unsupported {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.chat-mic.unsupported:hover { color: var(--hh-text-dim); border-color: var(--hh-border-strong); }
+
+.chat-status {
+  display: none;
+  align-items: center; gap: 10px;
+  padding: 8px 16px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--hh-text-dim);
+  background: rgba(55, 104, 240, 0.06);
+  border-top: 1px solid rgba(39, 37, 37, 0.04);
+}
+.chat-status.show { display: flex; }
+.chat-status .blob {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--hh-blue);
+  animation: typing 1.2s ease-in-out infinite;
+}
+.chat-status.listening { color: var(--hh-rose); background: rgba(200, 75, 90, 0.06); }
+.chat-status.listening .blob { background: var(--hh-rose); }
+.chat-status.speaking { color: var(--hh-teal-dark); background: rgba(74, 156, 140, 0.06); }
+.chat-status.speaking .blob { background: var(--hh-teal-dark); }
+.chat-status button {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hh-text-dim);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.chat-status button:hover { background: rgba(39, 37, 37, 0.06); color: var(--hh-text); }
+
+.chat-input.is-listening {
+  border-color: var(--hh-rose);
+  box-shadow: 0 0 0 3px rgba(200, 75, 90, 0.12);
+}
+.chat-input .interim {
+  color: var(--hh-text-faint);
+  font-style: italic;
+}
+
+.chat-typing {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 14px;
+  animation: msgIn 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.chat-typing span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--hh-blue);
+  opacity: 0.4;
+  animation: typing 1.2s ease-in-out infinite;
+}
+.chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing {
+  0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
 @media (max-width: 1320px) {
   .main, .topbar { grid-template-columns: 264px 1fr 312px; }
   .stage { padding: 24px 28px 64px; }
@@ -1692,6 +2041,7 @@ body::before {
   .hero-grid { grid-template-columns: 1fr 1fr; }
   .adoption-row { grid-template-columns: 1fr 1fr; }
   .adopt-stat:nth-child(2) { border-right: none; padding-right: 0; }
+  .chat-dock { width: calc(100vw - 32px); right: 16px; bottom: 16px; }
 }
 </style>
 </head>
@@ -2465,6 +2815,82 @@ body::before {
 
 <div class="toast" id="toast">Board pre-read prompt sent to Cowork · open the side panel</div>
 
+<!-- ============ CHAT DOCK ============ -->
+<div class="chat-dock" id="chatDock">
+  <div class="chat-head">
+    <div class="chat-brand">
+      <div class="chat-mark"></div>
+      <div>
+        <div class="chat-title">Talk to <em>Hub</em></div>
+        <div class="chat-sub">Will update your day as you speak</div>
+      </div>
+    </div>
+    <div class="chat-cta">
+      Ask me anything <span class="chat-cta-sub">or just dictate</span>
+    </div>
+    <div style="display: flex; align-items: center;">
+      <button class="voice-pill" id="voicePill" aria-label="Toggle voice mode" title="Conversation mode: I'll speak my replies and re-open the mic">Voice</button>
+      <button class="chat-toggle" id="chatToggle" aria-label="Toggle chat">
+        <svg id="chatToggleIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="chat-body">
+    <div class="chat-stream" id="chatStream">
+
+      <div class="chat-msg ai">
+        Morning, Marina. The <strong>09:30 with the CIO</strong> is in 18 minutes and I've laid the Board summary on top of your Owed-today list. Anything you want to add before you walk in?
+      </div>
+
+      <div class="chat-msg you">
+        Just spoke to him in the corridor. He wants the Board summary to lead with the <strong>cost-of-inaction number</strong>, not the framework. And we're adding <strong>Mira Patel</strong> to the SDR cohort feedback group.
+      </div>
+
+      <div class="chat-action">
+        Re-drafted the Board pre-read hero — now opens on the <strong>€15M / 3% turnover</strong> figure. Diff in the prep prompt.
+      </div>
+
+      <div class="chat-action">
+        Added <strong>Mira Patel</strong> to the SDR feedback group · she'll be on Monday's digest. Tagged her in the 15:30 Wave 3 prep.
+      </div>
+
+      <div class="chat-msg ai">
+        Done both. The CIO's note is also pinned to the <strong>09:30 sponsor sync</strong> in your Today rail. Want me to draft a quick "thanks for the steer" message you can send him before the meeting?
+      </div>
+
+      <div class="chat-msg you">
+        Yes, keep it short. Two lines.
+      </div>
+
+      <div class="chat-action">
+        Draft sitting in your Outlook · <strong>"Cost-of-inaction framing — appreciated, doing it."</strong> Hold to send.
+      </div>
+
+    </div>
+
+    <div class="chat-status" id="chatStatus">
+      <span class="blob"></span>
+      <span id="chatStatusText">Listening…</span>
+      <button id="chatStatusStop" type="button">Stop</button>
+    </div>
+
+    <form class="chat-form" id="chatForm" autocomplete="off">
+      <input class="chat-input" id="chatInput" type="text" placeholder="Tell me what changed, or hit the mic…" />
+      <button class="chat-mic" id="chatMic" type="button" aria-label="Dictate">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="22"></line>
+        </svg>
+      </button>
+      <button class="chat-send" type="submit" aria-label="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
 <script>
 function copyPrompt() {
   const prompt = `Draft the 27 May Board pre-read on AI governance, format SCR + Action Titles (each title ≤15 words, conclusion not topic). Pull from EU AI Act Article 4, our risk register, and the May ISO 42001 gap audit. Include:
@@ -2563,6 +2989,329 @@ document.querySelectorAll('.btn-defer').forEach(btn => {
     else showToast('Opening…');
   });
 });
+
+// ============ CHAT DOCK ============
+const chatDock = document.getElementById('chatDock');
+const chatToggle = document.getElementById('chatToggle');
+const chatToggleIcon = document.getElementById('chatToggleIcon');
+const chatStream = document.getElementById('chatStream');
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+
+function setChatCollapsed(collapsed) {
+  chatDock.classList.toggle('collapsed', collapsed);
+  chatToggleIcon.innerHTML = collapsed
+    ? '<polyline points="6 15 12 9 18 15"></polyline>'
+    : '<polyline points="6 9 12 15 18 9"></polyline>';
+  if (!collapsed) {
+    setTimeout(() => { chatStream.scrollTop = chatStream.scrollHeight; chatInput.focus(); }, 60);
+  }
+}
+
+chatToggle.addEventListener('click', () => {
+  setChatCollapsed(!chatDock.classList.contains('collapsed'));
+});
+// Click anywhere on collapsed dock to expand
+chatDock.querySelector('.chat-head').addEventListener('click', (e) => {
+  if (chatDock.classList.contains('collapsed') && e.target !== chatToggle && !chatToggle.contains(e.target)) {
+    setChatCollapsed(false);
+  }
+});
+
+function appendMsg(html, cls) {
+  const el = document.createElement('div');
+  el.className = cls;
+  el.innerHTML = html;
+  chatStream.appendChild(el);
+  chatStream.scrollTop = chatStream.scrollHeight;
+  return el;
+}
+
+function showTyping() {
+  const el = document.createElement('div');
+  el.className = 'chat-typing';
+  el.innerHTML = '<span></span><span></span><span></span>';
+  chatStream.appendChild(el);
+  chatStream.scrollTop = chatStream.scrollHeight;
+  return el;
+}
+
+// Heuristic-based demo response — picks a plausible reaction to the user's input
+function craftResponse(text) {
+  const t = text.toLowerCase();
+  const matches = (...keys) => keys.some(k => t.includes(k));
+
+  if (matches('meeting', 'call', 'sync', 'discuss', 'spoke', 'talked')) {
+    return {
+      action: 'Captured to <strong>today\'s meeting log</strong> · the relevant Today-rail entry now carries this note.',
+      ai: 'Logged. Want me to surface it on the meeting card so you see it before you walk in next time?'
+    };
+  }
+  if (matches('promise', 'told', 'said i\'d', 'said i would', 'committed', 'i owe', 'send', 'draft')) {
+    return {
+      action: 'Added a new card to <strong>This week, you owe</strong> · routed against the right stakeholder.',
+      ai: 'Tracked. I\'ll keep an eye on it and remind you 24h before the due date.'
+    };
+  }
+  if (matches('board', 'eu ai act', 'governance', 'policy', 'iso 42001')) {
+    return {
+      action: 'Updated the <strong>AI Governance Policy v2</strong> brief · diff pinned to the hero card.',
+      ai: 'Done. Want me to flag this to the CISO before the 27 May Board pre-read?'
+    };
+  }
+  if (matches('adoption', 'copilot', 'wave', 'sdr', 'sales', 'champion')) {
+    return {
+      action: 'Routed to the <strong>Copilot Wave 3</strong> programme · adoption strip noted.',
+      ai: 'Got it. The next champion broadcast can lead with this — say the word and I\'ll draft.'
+    };
+  }
+  if (matches('draft', 'write', 'brief', 'pre-read', 'email', 'slide')) {
+    return {
+      action: 'Drafted in your Outlook / Cowork side panel · awaiting your review.',
+      ai: 'Sitting in your drafts. Open when you\'re ready — nothing sends until you say so.'
+    };
+  }
+  return {
+    action: 'Captured to your day · I\'ll surface it on the right card when it becomes relevant.',
+    ai: 'Got it. Anything else you want me to wire in?'
+  };
+}
+
+chatForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const text = chatInput.value.trim();
+  if (!text) return;
+  appendMsg(escapeHtml(text), 'chat-msg you');
+  chatInput.value = '';
+  chatInput.disabled = true;
+
+  const typing = showTyping();
+  setTimeout(() => {
+    typing.remove();
+    const reply = craftResponse(text);
+    appendMsg(reply.action, 'chat-action');
+    setTimeout(() => {
+      appendMsg(reply.ai, 'chat-msg ai');
+      chatInput.disabled = false;
+      chatInput.focus();
+    }, 250);
+  }, 750 + Math.random() * 400);
+});
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+// Scroll chat to bottom on first paint
+setTimeout(() => { chatStream.scrollTop = chatStream.scrollHeight; }, 80);
+
+// ============ VOICE: dictation + conversation mode ============
+const chatMic = document.getElementById('chatMic');
+const voicePill = document.getElementById('voicePill');
+const chatStatus = document.getElementById('chatStatus');
+const chatStatusText = document.getElementById('chatStatusText');
+const chatStatusStop = document.getElementById('chatStatusStop');
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const TTS = window.speechSynthesis;
+let recognition = null;
+let isListening = false;
+let isSpeaking = false;
+let voiceMode = false;
+let suppressAutoListen = false;
+
+function setStatus(kind, text) {
+  chatStatus.className = 'chat-status show ' + (kind || '');
+  chatStatusText.textContent = text;
+  chatStatusStop.style.display = kind ? '' : 'none';
+}
+function hideStatus() {
+  chatStatus.className = 'chat-status';
+}
+
+// --- Speech recognition ---
+function initRecognition() {
+  if (!SR) {
+    chatMic.classList.add('unsupported');
+    chatMic.title = 'Voice input not supported in this browser. Try Chrome, Edge, or Safari.';
+    voicePill.classList.add('unsupported');
+    voicePill.style.opacity = '0.5';
+    voicePill.style.cursor = 'not-allowed';
+    voicePill.title = 'Voice mode not supported in this browser. Try Chrome, Edge, or Safari.';
+    return false;
+  }
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = navigator.language || 'en-GB';
+
+  recognition.onstart = () => {
+    isListening = true;
+    chatMic.classList.add('listening');
+    chatInput.classList.add('is-listening');
+    chatInput.value = '';
+    chatInput.placeholder = 'Listening…';
+    setStatus('listening', 'Listening — speak naturally');
+  };
+
+  recognition.onresult = (event) => {
+    let interim = '', final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) final += t;
+      else interim += t;
+    }
+    if (final) chatInput.value = (chatInput.value + ' ' + final).trim();
+    chatInput.setAttribute('data-interim', interim);
+    // Show interim text as the placeholder while listening
+    if (interim) chatInput.placeholder = '… ' + interim;
+  };
+
+  recognition.onerror = (e) => {
+    const msg = e.error === 'not-allowed'
+      ? 'Mic permission denied — enable it in your browser settings.'
+      : e.error === 'no-speech'
+        ? 'Didn\'t catch that.'
+        : 'Voice error: ' + e.error;
+    setStatus('', msg);
+    setTimeout(hideStatus, 2200);
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    chatMic.classList.remove('listening');
+    chatInput.classList.remove('is-listening');
+    chatInput.placeholder = 'Tell me what changed, or hit the mic…';
+    hideStatus();
+    // In voice mode, auto-send if we have content
+    if (voiceMode && !suppressAutoListen && chatInput.value.trim()) {
+      setTimeout(() => chatForm.dispatchEvent(new Event('submit')), 250);
+    }
+    suppressAutoListen = false;
+  };
+
+  return true;
+}
+
+function startListening() {
+  if (!recognition) return;
+  if (isSpeaking) { TTS.cancel(); isSpeaking = false; }
+  if (isListening) return;
+  try { recognition.start(); }
+  catch (e) { /* already started */ }
+}
+function stopListening() {
+  if (!recognition || !isListening) return;
+  suppressAutoListen = true;
+  try { recognition.stop(); } catch (e) {}
+}
+
+// --- Text to speech ---
+let preferredVoice = null;
+function pickVoice() {
+  const voices = TTS.getVoices();
+  if (!voices.length) return;
+  // Prefer en-GB female voices, then en-US, then anything English
+  const candidates = [
+    v => v.lang === 'en-GB' && /female|samantha|kate|serena|fiona/i.test(v.name),
+    v => v.lang === 'en-GB',
+    v => v.lang === 'en-US' && /female|samantha|allison|ava/i.test(v.name),
+    v => v.lang === 'en-US',
+    v => v.lang.startsWith('en'),
+  ];
+  for (const test of candidates) {
+    const found = voices.find(test);
+    if (found) { preferredVoice = found; return; }
+  }
+}
+if (TTS) {
+  pickVoice();
+  TTS.onvoiceschanged = pickVoice;
+}
+
+function speak(text) {
+  if (!TTS) return;
+  TTS.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 1.05;
+  utter.pitch = 1.0;
+  utter.volume = 1.0;
+  if (preferredVoice) utter.voice = preferredVoice;
+  utter.onstart = () => {
+    isSpeaking = true;
+    setStatus('speaking', 'Hub speaking…');
+  };
+  utter.onend = () => {
+    isSpeaking = false;
+    hideStatus();
+    // In voice mode, re-open the mic for the next turn
+    if (voiceMode) setTimeout(startListening, 300);
+  };
+  utter.onerror = () => { isSpeaking = false; hideStatus(); };
+  TTS.speak(utter);
+}
+
+// --- Wire up UI ---
+chatMic.addEventListener('click', () => {
+  if (!SR) {
+    setStatus('', 'Voice input not supported in this browser. Try Chrome, Edge, or Safari.');
+    setTimeout(hideStatus, 2800);
+    return;
+  }
+  if (isListening) stopListening();
+  else startListening();
+});
+
+voicePill.addEventListener('click', () => {
+  if (!SR || !TTS) {
+    setStatus('', 'Voice mode needs a browser with speech support (Chrome, Edge, Safari).');
+    setTimeout(hideStatus, 2800);
+    return;
+  }
+  voiceMode = !voiceMode;
+  voicePill.classList.toggle('on', voiceMode);
+  voicePill.textContent = voiceMode ? 'Voice · on' : 'Voice';
+  // Re-append the ::before dot via class toggling — DOM rebuild not needed
+  if (voiceMode) {
+    if (chatDock.classList.contains('collapsed')) setChatCollapsed(false);
+    startListening();
+  } else {
+    stopListening();
+    TTS.cancel();
+    hideStatus();
+  }
+});
+
+chatStatusStop.addEventListener('click', () => {
+  if (isListening) stopListening();
+  if (isSpeaking) { TTS.cancel(); isSpeaking = false; }
+  voiceMode = false;
+  voicePill.classList.remove('on');
+  voicePill.textContent = 'Voice';
+  hideStatus();
+});
+
+// Hook chat submit so AI replies get spoken in voice mode
+const originalCraftResponse = craftResponse;
+const _form = chatForm;
+// Monkey-patch: after the form's submit listener appends the AI message, also speak it if voice mode is on.
+// Easiest approach: observe new .chat-msg.ai additions.
+const obs = new MutationObserver((mutations) => {
+  if (!voiceMode || !TTS) return;
+  for (const m of mutations) {
+    for (const node of m.addedNodes) {
+      if (node.nodeType === 1 && node.classList.contains('chat-msg') && node.classList.contains('ai')) {
+        // Strip HTML tags for clean speech
+        const text = node.textContent.trim();
+        if (text) speak(text);
+      }
+    }
+  }
+});
+obs.observe(chatStream, { childList: true });
+
+// Init recognition on first interaction (some browsers want a user gesture)
+initRecognition();
 </script>
 
 </body>
