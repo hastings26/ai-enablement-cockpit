@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Cockpit · by Hastings Hub</title>
+<meta name="description" content="The daily workspace for an AI Enablement leader. Decisions, programmes, dependencies, and signals — all in one calm surface." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  /* Hastings Hub brand */
+  --hh-blue: #3768F0;
+  --hh-blue-soft: rgba(55, 104, 240, 0.12);
+  --hh-blue-faint: rgba(55, 104, 240, 0.06);
+  --hh-cyan: #00FFE7;
+  --hh-page-bg: #EEEFF5;
+  --hh-card-bg: #FFFFFF;
+  --hh-card-bg-tinted: #F5F6FB;
+  --hh-text: #272525;
+  --hh-text-dim: #6B6770;
+  --hh-text-faint: #9994A0;
+  --hh-warm-gold: #9E8A4F;
+  --hh-warm-cream: #FFF6F0;
+  --hh-cool-mint: #C2E8E2;
+  --hh-amber: #D89A3C;
+  --hh-teal-dark: #4A9C8C;
+  --hh-rose: #C84B5A;
+  --hh-purple: #7C5BC9;
+  --hh-border: rgba(39, 37, 37, 0.08);
+  --hh-border-strong: rgba(39, 37, 37, 0.14);
+
+  --depression-soft: 0 4px 12px rgba(55, 104, 240, 0.06), 0 1px 3px rgba(39, 37, 37, 0.04);
+  --depression: 0 8px 24px rgba(55, 104, 240, 0.10), 0 2px 8px rgba(39, 37, 37, 0.06);
+  --depression-strong: 0 14px 40px rgba(55, 104, 240, 0.13), 0 4px 14px rgba(39, 37, 37, 0.08);
+  --inset: inset 0 1px 2px rgba(39, 37, 37, 0.04);
+
+  --display: "Barlow", -apple-system, BlinkMacSystemFont, sans-serif;
+  --sans: "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--hh-text);
+  background: var(--hh-page-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Concentric circle background pattern — the Hastings Hub signature canvas */
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(55, 104, 240, 0.045) 0, transparent 28%),
+    radial-gradient(circle at 18% 22%, rgba(55, 104, 240, 0.06) 0, rgba(55, 104, 240, 0.06) 0.5%, transparent 0.6%, transparent 8%, rgba(55, 104, 240, 0.04) 8.1%, rgba(55, 104, 240, 0.04) 8.6%, transparent 8.7%, transparent 16%, rgba(55, 104, 240, 0.03) 16.1%, rgba(55, 104, 240, 0.03) 16.5%, transparent 16.6%, transparent 24%, rgba(55, 104, 240, 0.025) 24.1%, rgba(55, 104, 240, 0.025) 24.4%, transparent 24.5%),
+    radial-gradient(circle at 86% 78%, rgba(0, 255, 231, 0.035) 0, rgba(0, 255, 231, 0.035) 0.4%, transparent 0.5%, transparent 6%, rgba(0, 255, 231, 0.028) 6.1%, rgba(0, 255, 231, 0.028) 6.5%, transparent 6.6%, transparent 13%, rgba(0, 255, 231, 0.022) 13.1%, rgba(0, 255, 231, 0.022) 13.4%, transparent 13.5%);
+}
+
+.shell {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-rows: 64px 1fr;
+  height: 100vh;
+}
+
+/* ============ TOPBAR ============ */
+.topbar {
+  display: grid;
+  grid-template-columns: 304px 1fr 340px;
+  align-items: center;
+  background: var(--hh-card-bg);
+  border-bottom: 1px solid var(--hh-border);
+  box-shadow: 0 1px 0 rgba(39, 37, 37, 0.02), 0 4px 14px rgba(55, 104, 240, 0.05);
+  position: relative;
+  z-index: 10;
+}
+
+.brand {
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 24px;
+  height: 100%;
+  border-right: 1px solid var(--hh-border);
+}
+.brand-mark {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--hh-blue) 0%, #5B82FF 60%, var(--hh-cyan) 100%);
+  box-shadow: 0 2px 8px rgba(55, 104, 240, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  position: relative;
+}
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-top-color: transparent;
+  border-right-color: transparent;
+}
+.brand-wordmark {
+  display: flex; flex-direction: column; gap: 0;
+  line-height: 1;
+}
+.brand-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--hh-text);
+}
+.brand-name em {
+  font-style: normal;
+  color: var(--hh-blue);
+}
+.brand-sub {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hh-text-faint);
+  margin-top: 4px;
+}
+
+.topbar-center {
+  display: flex; align-items: center; gap: 32px;
+  padding: 0 32px;
+}
+.date-block {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--hh-text-dim);
+  font-weight: 500;
+}
+.date-block .pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--hh-blue-soft);
+  color: var(--hh-blue);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.date-block strong { color: var(--hh-text); font-weight: 600; }
+
+.deadline-strip {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--hh-text-dim);
+}
+.deadline-strip .countdown {
+  background: linear-gradient(135deg, #E64A2E, #C84B5A);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 8px rgba(200, 75, 90, 0.25);
+}
+.deadline-strip strong { color: var(--hh-text); font-weight: 600; }
+
+.topbar-right {
+  display: flex; align-items: center; justify-content: flex-end; gap: 14px;
+  padding: 0 24px;
+  height: 100%;
+  border-left: 1px solid var(--hh-border);
+}
+.cam-id { text-align: right; line-height: 1.25; }
+.cam-id .name {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--hh-text);
+}
+.cam-id .role {
+  font-size: 10.5px;
+  color: var(--hh-text-dim);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--hh-blue) 0%, var(--hh-cyan) 100%);
+  box-shadow: var(--depression-soft);
+  display: grid; place-items: center;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  color: white;
+  letter-spacing: 0.02em;
+}
+
+/* ============ MAIN ============ */
+.main {
+  display: grid;
+  grid-template-columns: 304px 1fr 340px;
+  overflow: hidden;
+}
+.col { overflow: hidden; display: flex; flex-direction: column; }
+.col + .col { border-left: 1px solid var(--hh-border); }
+
+.col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 22px 12px;
+}
+.col-eyebrow {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--hh-text-faint);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.col-eyebrow .count {
+  color: var(--hh-blue);
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+/* ============ LEFT: Programmes ============ */
+.search {
+  position: relative;
+  padding: 4px 18px 10px;
+}
+.search input {
+  width: 100%;
+  background: var(--hh-card-bg);
+  border: 1px solid var(--hh-border);
+  border-radius: 10px;
+  padding: 10px 14px 10px 36px;
+  color: var(--hh-text);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.15s;
+  box-shadow: var(--inset);
+}
+.search input::placeholder { color: var(--hh-text-faint); font-weight: 400; }
+.search input:focus {
+  border-color: var(--hh-blue);
+  box-shadow: var(--inset), 0 0 0 3px var(--hh-blue-soft);
+}
+.search svg {
+  position: absolute;
+  left: 30px; top: 50%;
+  transform: translateY(-65%);
+  color: var(--hh-text-faint);
+}
+
+.filter-row {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding: 4px 18px 14px;
+  border-bottom: 1px solid var(--hh-border);
+}
+.chip {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hh-text-dim);
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--hh-border);
+  background: var(--hh-card-bg);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip:hover { color: var(--hh-text); border-color: var(--hh-border-strong); }
+.chip.active {
+  color: white;
+  border-color: var(--hh-blue);
+  background: var(--hh-blue);
+  box-shadow: 0 2px 6px rgba(55, 104, 240, 0.25);
+}
+
+.programme-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 60px;
+}
+.programme-list::-webkit-scrollbar { width: 6px; }
+.programme-list::-webkit-scrollbar-thumb { background: rgba(39, 37, 37, 0.10); border-radius: 3px; }
+
+.programme {
+  display: grid;
+  grid-template-columns: 4px 1fr;
+  gap: 12px;
+  align-items: stretch;
+  padding: 12px 14px 12px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 4px;
+  background: transparent;
+}
+.programme:hover {
+  background: var(--hh-card-bg);
+  box-shadow: var(--depression-soft);
+}
+.programme.active {
+  background: var(--hh-card-bg);
+  box-shadow: var(--depression);
+}
+
+.stage-bar { border-radius: 2px; background: var(--hh-text-faint); }
+.stage-bar.diagnose { background: var(--hh-purple); }
+.stage-bar.architect { background: var(--hh-blue); }
+.stage-bar.execute { background: var(--hh-teal-dark); }
+.stage-bar.defend { background: var(--hh-amber); }
+.stage-bar.sharpen { background: var(--hh-rose); }
+.stage-bar.operating { background: var(--hh-text-faint); }
+
+.programme-body { min-width: 0; }
+.programme-row {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px;
+}
+.programme-name {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--hh-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: -0.005em;
+}
+.programme-stage {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hh-text-faint);
+  white-space: nowrap;
+}
+.stage-bar.diagnose ~ .programme-body .programme-stage { color: var(--hh-purple); }
+.stage-bar.architect ~ .programme-body .programme-stage { color: var(--hh-blue); }
+.stage-bar.execute ~ .programme-body .programme-stage { color: var(--hh-teal-dark); }
+.stage-bar.defend ~ .programme-body .programme-stage { color: var(--hh-amber); }
+.stage-bar.sharpen ~ .programme-body .programme-stage { color: var(--hh-rose); }
+
+.programme-meta {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 10.5px;
+  color: var(--hh-text-faint);
+  margin-top: 3px;
+  display: flex; gap: 8px; align-items: center;
+}
+.programme-meta .health {
+  width: 6px; height: 6px; border-radius: 50%;
+  display: inline-block;
+}
+.health.green { background: var(--hh-teal-dark); }
+.health.amber { background: var(--hh-amber); }
+.health.red { background: var(--hh-rose); }
+.health.grey { background: var(--hh-text-faint); }
+
+/* ============ CENTRE STAGE ============ */
+.stage {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px 64px;
+}
+.stage::-webkit-scrollbar { width: 6px; }
+.stage::-webkit-scrollbar-thumb { background: rgba(39, 37, 37, 0.10); border-radius: 3px; }
+
+.stage-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 26px;
+  gap: 24px;
+}
+.stage-greeting {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--hh-warm-gold) 0%, #B89A52 50%, var(--hh-warm-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.stage-sub {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--hh-text-dim);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.stage-sub strong { color: var(--hh-text); font-weight: 700; }
+.stage-sub .dot { color: var(--hh-text-faint); margin: 0 6px; }
+
+/* HERO — decision card with depression */
+.hero {
+  position: relative;
+  background: var(--hh-card-bg);
+  border-radius: 18px;
+  padding: 30px 32px 28px;
+  box-shadow: var(--depression-strong);
+  margin-bottom: 32px;
+  overflow: hidden;
+  animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  border-left: 4px solid var(--hh-blue);
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -160px; right: -80px;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--hh-blue-soft) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 20%; right: -120px;
+  width: 240px; height: 240px;
+  border: 1px solid rgba(0, 255, 231, 0.15);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+  flex-wrap: wrap; gap: 12px;
+}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hh-blue);
+}
+.hero-eyebrow .pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--hh-blue);
+  box-shadow: 0 0 0 0 var(--hh-blue);
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(55, 104, 240, 0.5); }
+  100% { box-shadow: 0 0 0 14px rgba(55, 104, 240, 0); }
+}
+.hero-meta {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 11.5px;
+  color: var(--hh-text-dim);
+}
+.hero-meta strong { color: var(--hh-text); font-weight: 700; }
+
+.hero-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.018em;
+  margin-bottom: 12px;
+  color: var(--hh-text);
+}
+
+.hero-frame {
+  font-size: 13px;
+  color: var(--hh-text-dim);
+  margin-bottom: 22px;
+  line-height: 1.6;
+  padding-left: 16px;
+  border-left: 3px solid var(--hh-blue);
+  font-weight: 500;
+}
+.hero-frame strong { color: var(--hh-text); font-weight: 700; }
+.hero-frame em {
+  color: var(--hh-blue);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.hero-tile {
+  background: var(--hh-card-bg-tinted);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: var(--inset);
+}
+.hero-tile-eyebrow {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hh-text-faint);
+  margin-bottom: 6px;
+}
+.hero-tile-body {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--hh-text);
+}
+.hero-tile-body strong { color: var(--hh-blue); font-weight: 700; }
+.hero-tile-body .num {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--hh-text);
+  margin-top: 4px;
+  letter-spacing: -0.02em;
+}
+
+.prompt-block {
+  position: relative;
+  background: linear-gradient(180deg, #1A1D24 0%, #14171D 100%);
+  border-radius: 12px;
+  padding: 18px 20px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: #E0E2EA;
+  margin-bottom: 18px;
+  box-shadow: var(--depression);
+}
+.prompt-block .prompt-label {
+  position: absolute;
+  top: -10px; left: 16px;
+  background: var(--hh-card-bg);
+  padding: 3px 10px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hh-blue);
+  border-radius: 6px;
+  box-shadow: var(--depression-soft);
+}
+.prompt-block strong { color: #FFFFFF; font-weight: 600; }
+.prompt-block ul { list-style: none; margin: 8px 0; padding-left: 0; }
+.prompt-block ul li {
+  padding-left: 20px;
+  position: relative;
+  color: #DCDFE8;
+}
+.prompt-block ul li::before {
+  content: "→";
+  position: absolute; left: 4px;
+  color: var(--hh-cyan);
+  font-weight: 700;
+}
+.prompt-block em {
+  display: block;
+  margin-top: 10px;
+  color: var(--hh-cyan);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.hero-actions {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 11px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--hh-border-strong);
+  background: var(--hh-card-bg);
+  color: var(--hh-text);
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: var(--depression-soft);
+}
+.btn:hover {
+  border-color: var(--hh-blue);
+  color: var(--hh-blue);
+  box-shadow: var(--depression);
+  transform: translateY(-1px);
+}
+.btn-primary {
+  background: var(--hh-blue);
+  color: white;
+  border-color: var(--hh-blue);
+  box-shadow: 0 4px 14px rgba(55, 104, 240, 0.35), 0 1px 3px rgba(55, 104, 240, 0.2);
+}
+.btn-primary:hover {
+  background: #2D58D8;
+  border-color: #2D58D8;
+  color: white;
+  box-shadow: 0 6px 20px rgba(55, 104, 240, 0.45);
+}
+.btn-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--hh-text-dim);
+  box-shadow: none;
+}
+.btn-ghost:hover { color: var(--hh-blue); background: var(--hh-blue-soft); box-shadow: none; transform: none; }
+
+/* Section bar */
+.section-bar {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 10px 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--hh-border);
+}
+.section-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  color: var(--hh-text);
+}
+.section-title em {
+  color: var(--hh-blue);
+  font-style: normal;
+}
+.section-aside {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--hh-text-faint);
+  letter-spacing: 0.02em;
+}
+
+/* Week timeline */
+.week-row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 8px;
+  border-bottom: 1px dashed var(--hh-border);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 8px;
+}
+.week-row:hover {
+  background: var(--hh-card-bg);
+  padding-left: 16px;
+  box-shadow: var(--depression-soft);
+}
+.week-row:last-child { border-bottom: none; }
+.week-day {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--hh-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.week-day strong {
+  display: block;
+  font-family: var(--display);
+  color: var(--hh-text);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  margin-top: 2px;
+}
+.week-body .what {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--hh-text);
+  letter-spacing: -0.005em;
+}
+.week-body .why {
+  font-size: 11.5px;
+  color: var(--hh-text-dim);
+  margin-top: 3px;
+  font-weight: 500;
+}
+.week-body .why .tag {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-right: 8px;
+  color: var(--hh-blue);
+  background: var(--hh-blue-soft);
+}
+.week-body .why .tag.amber { color: #B47815; background: rgba(216, 154, 60, 0.15); }
+.week-body .why .tag.teal { color: var(--hh-teal-dark); background: rgba(74, 156, 140, 0.13); }
+.week-body .why .tag.rose { color: var(--hh-rose); background: rgba(200, 75, 90, 0.12); }
+.week-body .why .tag.purple { color: var(--hh-purple); background: rgba(124, 91, 201, 0.12); }
+.mini-action {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hh-text-faint);
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+}
+.week-row:hover .mini-action {
+  color: var(--hh-blue);
+  border-color: var(--hh-blue);
+}
+
+/* Adoption / programme pipeline visual */
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.stage-col {
+  background: var(--hh-card-bg);
+  border-radius: 12px;
+  padding: 14px 12px 16px;
+  min-height: 140px;
+  box-shadow: var(--depression-soft);
+}
+.stage-col-head {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hh-border);
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.stage-col-head .label { color: var(--hh-text-dim); }
+.stage-col-head .count {
+  color: var(--hh-text-faint);
+  font-size: 9px;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+.pipeline .stage-col:nth-child(1) .stage-col-head .label { color: var(--hh-purple); }
+.pipeline .stage-col:nth-child(2) .stage-col-head .label { color: var(--hh-blue); }
+.pipeline .stage-col:nth-child(3) .stage-col-head .label { color: var(--hh-teal-dark); }
+.pipeline .stage-col:nth-child(4) .stage-col-head .label { color: var(--hh-amber); }
+.pipeline .stage-col:nth-child(5) .stage-col-head .label { color: var(--hh-text-dim); }
+
+.pipe-item {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  background: var(--hh-card-bg-tinted);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  color: var(--hh-text);
+}
+.pipe-item:hover { background: var(--hh-blue-soft); }
+.pipe-item .meta {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--hh-text-faint);
+  font-weight: 500;
+  margin-top: 3px;
+}
+.pipe-item.stuck {
+  background: rgba(200, 75, 90, 0.06);
+  border-left: 2px solid var(--hh-rose);
+}
+.pipe-item.stuck::after {
+  content: "stuck";
+  position: absolute;
+  right: 8px; top: 8px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hh-rose);
+}
+
+/* Adoption strip */
+.adoption {
+  background: var(--hh-card-bg);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: var(--depression);
+  margin-top: 14px;
+}
+.adoption-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 18px;
+}
+.adopt-stat {
+  border-right: 1px solid var(--hh-border);
+  padding-right: 18px;
+}
+.adopt-stat:last-child { border-right: none; }
+.adopt-eyebrow {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hh-text-faint);
+  margin-bottom: 6px;
+}
+.adopt-value {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  color: var(--hh-text);
+  line-height: 1;
+}
+.adopt-value.warn { color: var(--hh-amber); }
+.adopt-value.good { color: var(--hh-teal-dark); }
+.adopt-value .unit {
+  font-size: 14px;
+  color: var(--hh-text-faint);
+  font-weight: 500;
+  margin-left: 2px;
+}
+.adopt-delta {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--hh-teal-dark);
+}
+.adopt-delta.down { color: var(--hh-rose); }
+.adopt-meta {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--hh-text-dim);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* News — outside the building */
+.news {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.news-col {
+  background: var(--hh-card-bg);
+  border-radius: 14px;
+  padding: 18px 18px 14px;
+  box-shadow: var(--depression-soft);
+}
+.news-col.ai {
+  background: linear-gradient(180deg, rgba(0, 255, 231, 0.05) 0%, var(--hh-card-bg) 100%);
+}
+.news-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--hh-border);
+}
+.news-eyebrow {
+  display: flex; align-items: center; gap: 9px;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hh-text);
+}
+.news-dot { width: 8px; height: 8px; border-radius: 50%; }
+.news-dot.region { background: var(--hh-blue); box-shadow: 0 0 0 3px var(--hh-blue-soft); }
+.news-dot.ai { background: var(--hh-cyan); box-shadow: 0 0 0 3px rgba(0, 255, 231, 0.15); }
+.news-meta {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--hh-text-faint);
+  text-transform: uppercase;
+}
+
+.news-card {
+  display: block;
+  padding: 12px 6px 14px;
+  border-bottom: 1px dashed var(--hh-border);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 4px;
+}
+.news-card:last-child { border-bottom: none; }
+.news-card:hover { background: var(--hh-card-bg-tinted); padding-left: 10px; }
+.news-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.news-tag {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 4px;
+  color: var(--hh-blue);
+  background: var(--hh-blue-soft);
+}
+.news-tag.regulation { color: var(--hh-rose); background: rgba(200, 75, 90, 0.10); }
+.news-tag.competitive { color: var(--hh-purple); background: rgba(124, 91, 201, 0.10); }
+.news-tag.benchmark { color: var(--hh-teal-dark); background: rgba(74, 156, 140, 0.10); }
+.news-tag.stat { color: var(--hh-warm-gold); background: rgba(158, 138, 79, 0.12); }
+.news-tag.vendor { color: var(--hh-text-dim); background: rgba(39, 37, 37, 0.06); }
+.news-source {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--hh-text-faint);
+  white-space: nowrap;
+}
+.news-source strong { color: var(--hh-text-dim); font-weight: 700; }
+.news-headline {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--hh-text);
+  margin-bottom: 5px;
+  letter-spacing: -0.005em;
+}
+.news-why {
+  font-size: 11.5px;
+  color: var(--hh-text-dim);
+  line-height: 1.45;
+  font-weight: 500;
+}
+.news-why::before {
+  content: "→ ";
+  color: var(--hh-blue);
+  font-weight: 700;
+}
+.news-col.ai .news-why::before { color: var(--hh-teal-dark); }
+
+.news-disclaimer {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--hh-text-dim);
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--hh-card-bg-tinted);
+  line-height: 1.55;
+  font-weight: 500;
+}
+.news-disclaimer strong { color: var(--hh-text); font-weight: 700; }
+.news-disclaimer code {
+  font-family: var(--mono);
+  font-size: 10px;
+  background: var(--hh-card-bg);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--hh-blue);
+}
+
+/* ============ RIGHT: Focus + Nudges ============ */
+.focus {
+  margin: 4px 20px 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--hh-blue) 0%, #5B82FF 60%, #8B6BFF 100%);
+  color: white;
+  box-shadow: 0 8px 24px rgba(55, 104, 240, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+.focus::after {
+  content: "";
+  position: absolute;
+  top: -40%; right: -20%;
+  width: 200px; height: 200px;
+  border: 1.5px solid rgba(0, 255, 231, 0.25);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.focus-eyebrow {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+}
+.focus-line {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.focus-line em {
+  font-style: normal;
+  color: var(--hh-cyan);
+}
+.focus-stats {
+  display: flex; gap: 18px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.focus-stats div {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+.focus-stats strong {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  color: white;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.nudges {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 60px;
+}
+.nudges::-webkit-scrollbar { width: 6px; }
+.nudges::-webkit-scrollbar-thumb { background: rgba(39, 37, 37, 0.10); border-radius: 3px; }
+
+.nudge {
+  position: relative;
+  background: var(--hh-card-bg);
+  border-radius: 12px;
+  padding: 14px 16px 14px 20px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: var(--depression-soft);
+}
+.nudge:hover { box-shadow: var(--depression); transform: translateY(-1px); }
+.nudge::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 14px; bottom: 14px;
+  width: 3px; border-radius: 2px;
+  background: var(--hh-blue);
+}
+.nudge.dependency::before { background: var(--hh-amber); }
+.nudge.decision::before { background: var(--hh-blue); }
+.nudge.theatre::before { background: var(--hh-purple); }
+.nudge.signal::before { background: var(--hh-teal-dark); }
+.nudge.risk::before { background: var(--hh-rose); }
+.nudge.ask::before { background: var(--hh-amber); }
+.nudge.champion::before { background: var(--hh-cyan); }
+
+.nudge-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 7px;
+}
+.nudge-tag {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hh-blue);
+}
+.nudge.dependency .nudge-tag { color: var(--hh-amber); }
+.nudge.theatre .nudge-tag { color: var(--hh-purple); }
+.nudge.signal .nudge-tag { color: var(--hh-teal-dark); }
+.nudge.risk .nudge-tag { color: var(--hh-rose); }
+.nudge.ask .nudge-tag { color: var(--hh-amber); }
+.nudge.champion .nudge-tag { color: var(--hh-teal-dark); }
+
+.nudge-time {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 9.5px;
+  color: var(--hh-text-faint);
+}
+.nudge-body {
+  font-size: 12.5px;
+  color: var(--hh-text);
+  line-height: 1.5;
+  font-weight: 500;
+}
+.nudge-body strong { color: var(--hh-text); font-weight: 700; }
+.nudge-body em { color: var(--hh-text-dim); font-style: normal; }
+.nudge-foot {
+  margin-top: 12px;
+  display: flex; align-items: center; gap: 14px;
+}
+.nudge-link {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--hh-text-dim);
+  cursor: pointer;
+  border: none; background: none; padding: 0;
+}
+.nudge-link:hover { color: var(--hh-blue); }
+.nudge-link.dismiss:hover { color: var(--hh-text-faint); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--hh-text);
+  color: white;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  display: flex; align-items: center; gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 100;
+  box-shadow: 0 14px 40px rgba(39, 37, 37, 0.30);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast::before {
+  content: "";
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--hh-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 231, 0.6);
+}
+
+.programme { animation: fadeIn 0.4s ease both; }
+.programme:nth-child(n+2) { animation-delay: calc(0.03s * var(--n, 1)); }
+.nudge { animation: fadeIn 0.5s ease both; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1320px) {
+  .main, .topbar { grid-template-columns: 264px 1fr 312px; }
+  .stage { padding: 24px 28px 64px; }
+  .news { grid-template-columns: 1fr; }
+  .hero-grid { grid-template-columns: 1fr 1fr; }
+  .adoption-row { grid-template-columns: 1fr 1fr; }
+  .adopt-stat:nth-child(2) { border-right: none; padding-right: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ TOPBAR ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-wordmark">
+        <div class="brand-name">AI <em>Cockpit</em></div>
+        <div class="brand-sub">By Hastings Hub</div>
+      </div>
+    </div>
+    <div class="topbar-center">
+      <div class="date-block">
+        <span class="pill">LIVE</span>
+        <span><strong>Thursday · 21 May 2026</strong></span>
+      </div>
+      <div class="deadline-strip">
+        <span class="countdown">73 days</span>
+        <span>until <strong>EU AI Act</strong> · Article 4 enforcement (Aug 2)</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="cam-id">
+        <div class="name">Marina Diaz</div>
+        <div class="role">Director, AI Enablement</div>
+      </div>
+      <div class="avatar">MD</div>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <!-- ============ LEFT: PROGRAMMES ============ -->
+    <aside class="col">
+      <div class="col-header">
+        <div class="col-eyebrow">Programmes <span class="count">· 9</span></div>
+        <button class="nudge-link">+ new</button>
+      </div>
+
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input type="text" placeholder="Find a programme, owner, signal…" />
+      </div>
+
+      <div class="filter-row">
+        <button class="chip active">All</button>
+        <button class="chip">Active</button>
+        <button class="chip">Defending</button>
+        <button class="chip">At risk</button>
+        <button class="chip">Operating</button>
+      </div>
+
+      <div class="programme-list">
+
+        <div class="programme active" style="--n:1">
+          <div class="stage-bar defend"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">AI Governance Policy v2</div>
+              <div class="programme-stage">Defend</div>
+            </div>
+            <div class="programme-meta"><span class="health amber"></span> Board · 73d to EU AI Act</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:2">
+          <div class="stage-bar execute"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">Copilot Rollout · Wave 3</div>
+              <div class="programme-stage">Execute</div>
+            </div>
+            <div class="programme-meta"><span class="health amber"></span> CIO · 3,200 seats · 38% WAU</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:3">
+          <div class="stage-bar operating"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">AI Literacy Foundation</div>
+              <div class="programme-stage">Operating</div>
+            </div>
+            <div class="programme-meta"><span class="health green"></span> CHRO · cohort 14 · NPS 8.7</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:4">
+          <div class="stage-bar architect"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">Prompt Eng · Sales Play</div>
+              <div class="programme-stage">Architect</div>
+            </div>
+            <div class="programme-meta"><span class="health green"></span> VP Sales · pilot 12 reps</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:5">
+          <div class="stage-bar diagnose"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">Shadow AI Mitigation</div>
+              <div class="programme-stage">Diagnose</div>
+            </div>
+            <div class="programme-meta"><span class="health red"></span> CISO · 6 instances flagged</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:6">
+          <div class="stage-bar diagnose"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">Agentic Workflows Pilot</div>
+              <div class="programme-stage">Diagnose</div>
+            </div>
+            <div class="programme-meta"><span class="health amber"></span> COO · 4 use cases · 21d</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:7">
+          <div class="stage-bar sharpen"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">Q2 AI Value Report → ELT</div>
+              <div class="programme-stage">Sharpen</div>
+            </div>
+            <div class="programme-meta"><span class="health green"></span> CEO · draft ready · 28 May</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:8">
+          <div class="stage-bar operating"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">AI Champions Network</div>
+              <div class="programme-stage">Operating</div>
+            </div>
+            <div class="programme-meta"><span class="health green"></span> 47 champions · 12 BUs</div>
+          </div>
+        </div>
+
+        <div class="programme" style="--n:9">
+          <div class="stage-bar architect"></div>
+          <div class="programme-body">
+            <div class="programme-row">
+              <div class="programme-name">ISO 42001 Readiness</div>
+              <div class="programme-stage">Architect</div>
+            </div>
+            <div class="programme-meta"><span class="health amber"></span> CISO · gap audit this wk</div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ============ CENTRE STAGE ============ -->
+    <section class="col">
+      <div class="stage">
+
+        <div class="stage-head">
+          <div>
+            <div class="stage-greeting">The architect's view.</div>
+          </div>
+          <div class="stage-sub"><strong>9</strong> programmes <span class="dot">·</span> <strong>3</strong> decisions due <span class="dot">·</span> <strong>1</strong> planning-theatre flag</div>
+        </div>
+
+        <!-- HERO: Decision card -->
+        <div class="hero">
+          <div class="hero-head">
+            <div class="hero-eyebrow"><span class="pulse"></span> Next decision · 6 days</div>
+            <div class="hero-meta"><strong>AI Governance Policy v2</strong> · Sponsor: Board · ELT pre-read 27 May 14:00</div>
+          </div>
+
+          <div class="hero-title">EU AI Act readiness — get the framework approved, not every system</div>
+          <div class="hero-frame">
+            <strong>Diagnosis:</strong> 73 days to the Article 4 deadline. 0 of our 17 high-risk systems classified. <em>Coherent action:</em> the Board approves the classification standard and the AI Use Policy. Ops applies the standard to every system. Trying to take 17 systems through the Board kills the deadline.
+          </div>
+
+          <div class="hero-grid">
+            <div class="hero-tile">
+              <div class="hero-tile-eyebrow">Decision asked</div>
+              <div class="hero-tile-body">Endorse the <strong>classification framework</strong> + the AI Use Policy by 28 May.</div>
+            </div>
+            <div class="hero-tile">
+              <div class="hero-tile-eyebrow">Scope</div>
+              <div class="hero-tile-body">17 high-risk AI systems<span class="num">17</span></div>
+            </div>
+            <div class="hero-tile">
+              <div class="hero-tile-eyebrow">Cost of inaction</div>
+              <div class="hero-tile-body">Late filing = up to <strong>€15M / 3% turnover</strong></div>
+            </div>
+          </div>
+
+          <div class="prompt-block">
+            <span class="prompt-label">Cowork prompt · ready to run</span>
+            Draft the <strong>27 May Board pre-read</strong> on AI governance, format SCR + Action Titles ≤15 words. Pull from EU AI Act Article 4, our risk register, and the May ISO 42001 gap audit. Include:
+            <ul>
+              <li>Diagnosis · guiding policy · coherent action (one line each)</li>
+              <li>Classification framework — the 4 risk tiers, our 17 systems plotted</li>
+              <li>What the Board approves (the standard) vs what Ops applies (the systems)</li>
+              <li>AI Use Policy — Article 4 literacy obligation, training plan, attestation cadence</li>
+              <li>Cost of inaction — €15M / 3% turnover penalty exposure; reputational cost of public Article 4 failure</li>
+              <li>Single decision asked, with the next decision date if this one moves</li>
+            </ul>
+            <em>Close with the implication: missing 2 Aug = ineligible for public-sector AI tenders for 12 months.</em>
+          </div>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="copyPrompt()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 12 2 2 4-4"></path><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+              Send to Cowork
+            </button>
+            <button class="btn">Open risk register</button>
+            <button class="btn">Read EU AI Act Art. 4</button>
+            <button class="btn btn-ghost">Snooze</button>
+          </div>
+        </div>
+
+        <!-- ADOPTION STRIP -->
+        <div class="section-bar">
+          <div class="section-title">Adoption · <em>live signal</em></div>
+          <div class="section-aside">Wave 3 · 3,200 seats · updated 06:12</div>
+        </div>
+
+        <div class="adoption">
+          <div class="adoption-row">
+            <div class="adopt-stat">
+              <div class="adopt-eyebrow">Weekly active</div>
+              <div class="adopt-value warn">38<span class="unit">%</span></div>
+              <div class="adopt-delta down">−4pts wk/wk</div>
+              <div class="adopt-meta">Target 70% by 30 Jun</div>
+            </div>
+            <div class="adopt-stat">
+              <div class="adopt-eyebrow">Prompts / user / day</div>
+              <div class="adopt-value">11.4</div>
+              <div class="adopt-delta">+1.2 wk/wk</div>
+              <div class="adopt-meta">Active users only · stable</div>
+            </div>
+            <div class="adopt-stat">
+              <div class="adopt-eyebrow">Time returned</div>
+              <div class="adopt-value good">47<span class="unit">min/day</span></div>
+              <div class="adopt-delta">+6min wk/wk</div>
+              <div class="adopt-meta">Per active user · self-reported</div>
+            </div>
+            <div class="adopt-stat">
+              <div class="adopt-eyebrow">Shadow AI flags</div>
+              <div class="adopt-value">6</div>
+              <div class="adopt-delta down">+4 new</div>
+              <div class="adopt-meta">CISO weekly scan · HR + Sales</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THIS WEEK -->
+        <div class="section-bar" style="margin-top: 28px;">
+          <div class="section-title">This <em>week</em></div>
+          <div class="section-aside">3 decisions · 2 brief-ups · 1 cohort kickoff</div>
+        </div>
+
+        <div class="week-row">
+          <div class="week-day">Today <strong>22 May</strong></div>
+          <div class="week-body">
+            <div class="what">Champions monthly · 47 attendees · Wave 3 metrics share</div>
+            <div class="why"><span class="tag">Operating</span> Slot the new Sales-team adoption dip into the agenda. They need to see it.</div>
+          </div>
+          <button class="mini-action">Open →</button>
+        </div>
+
+        <div class="week-row">
+          <div class="week-day">Mon <strong>26 May</strong></div>
+          <div class="week-body">
+            <div class="what">CISO sync · ISO 42001 gap audit results</div>
+            <div class="why"><span class="tag amber">Architect</span> 6 control gaps surfaced. Need agreement on which 3 close before Board.</div>
+          </div>
+          <button class="mini-action">Prep →</button>
+        </div>
+
+        <div class="week-row">
+          <div class="week-day">Tue <strong>27 May</strong></div>
+          <div class="week-body">
+            <div class="what">Board AI Governance pre-read → Legal review</div>
+            <div class="why"><span class="tag">Defend</span> Dot-Dash already validated. SCR draft ships before 11:00 for legal turnaround.</div>
+          </div>
+          <button class="mini-action">Brief-up →</button>
+        </div>
+
+        <div class="week-row">
+          <div class="week-day">Wed <strong>28 May</strong></div>
+          <div class="week-body">
+            <div class="what">ELT Q2 AI value report</div>
+            <div class="why"><span class="tag teal">Sharpen</span> One Action Title per slide. Headline: time-returned ROI at the 70% adoption breakpoint.</div>
+          </div>
+          <button class="mini-action">Open →</button>
+        </div>
+
+        <div class="week-row">
+          <div class="week-day">Fri <strong>30 May</strong></div>
+          <div class="week-body">
+            <div class="what">AI Literacy cohort 15 kickoff · 84 enrolled</div>
+            <div class="why"><span class="tag purple">Operating</span> Largest cohort yet. Champions assigned 1:6 ratio. Open with the value story, not the curriculum.</div>
+          </div>
+          <button class="mini-action">Send brief →</button>
+        </div>
+
+        <!-- PIPELINE BOARD -->
+        <div class="section-bar" style="margin-top: 32px;">
+          <div class="section-title">Programme <em>pipeline</em></div>
+          <div class="section-aside">9 programmes · 1 stuck · 1 in Defend</div>
+        </div>
+
+        <div class="pipeline">
+          <div class="stage-col">
+            <div class="stage-col-head"><span class="label">Diagnose</span><span class="count">2</span></div>
+            <div class="pipe-item">Shadow AI Mitigation<span class="meta">6 instances · CISO</span></div>
+            <div class="pipe-item stuck">Agentic Workflows Pilot<span class="meta">21d · no shipped artefact</span></div>
+          </div>
+          <div class="stage-col">
+            <div class="stage-col-head"><span class="label">Architect</span><span class="count">2</span></div>
+            <div class="pipe-item">Prompt Eng · Sales<span class="meta">pilot 12 reps · 2 Jun</span></div>
+            <div class="pipe-item">ISO 42001 Readiness<span class="meta">gap audit Mon</span></div>
+          </div>
+          <div class="stage-col">
+            <div class="stage-col-head"><span class="label">Execute</span><span class="count">1</span></div>
+            <div class="pipe-item">Copilot · Wave 3<span class="meta">3,200 · 38% WAU</span></div>
+          </div>
+          <div class="stage-col">
+            <div class="stage-col-head"><span class="label">Defend</span><span class="count">1</span></div>
+            <div class="pipe-item">AI Governance v2<span class="meta">Board 27 May</span></div>
+          </div>
+          <div class="stage-col">
+            <div class="stage-col-head"><span class="label">Operating</span><span class="count">3</span></div>
+            <div class="pipe-item">AI Literacy · C14<span class="meta">NPS 8.7</span></div>
+            <div class="pipe-item">AI Champions Network<span class="meta">47 across 12 BUs</span></div>
+            <div class="pipe-item">Q2 AI Value Report<span class="meta">sharpen mode</span></div>
+          </div>
+        </div>
+
+        <!-- OUTSIDE THE BUILDING -->
+        <div class="section-bar" style="margin-top: 32px;">
+          <div class="section-title">Outside <em>the building</em></div>
+          <div class="section-aside">refreshed 06:00 · live web sources</div>
+        </div>
+
+        <div class="news">
+
+          <div class="news-col">
+            <div class="news-head">
+              <span class="news-eyebrow"><span class="news-dot region"></span> Regulation &amp; benchmarks</span>
+              <span class="news-meta">EU AI Act · ISO 42001 · NIST</span>
+            </div>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag regulation">Regulation · 73d</span>
+                <span class="news-source"><strong>European Commission</strong> · live</span>
+              </div>
+              <div class="news-headline">EU AI Act Article 4 (AI literacy) and most remaining provisions take effect 2 August 2026</div>
+              <div class="news-why">Hero card today. Each Member State must also stand up an AI regulatory sandbox by the same date.</div>
+            </article>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag benchmark">Procurement signal</span>
+                <span class="news-source"><strong>TrustCloud / GAICC</strong> · 9d</span>
+              </div>
+              <div class="news-headline">ISO 42001 certification moves from differentiator to table-stakes in enterprise vendor DDQs</div>
+              <div class="news-why">Procurement teams now require an AI management system on file. Your gap audit Monday matters more than it did last quarter.</div>
+            </article>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag benchmark">Research</span>
+                <span class="news-source"><strong>Stanford Digital Economy Lab</strong> · Mar</span>
+              </div>
+              <div class="news-headline">Enterprise AI Playbook — lessons from 51 deployments published</div>
+              <div class="news-why">Anchor for the ELT report Wed. Use the deployment-stage benchmarks, not the case studies.</div>
+            </article>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag stat">Stat for ELT</span>
+                <span class="news-source"><strong>Microsoft adoption telemetry</strong> · Apr</span>
+              </div>
+              <div class="news-headline">Role-based enablement + champion networks raise Copilot active usage by up to 40%</div>
+              <div class="news-why">Direct evidence the Champions Network is doing the work the budget paid for. Lead with this in the ELT report.</div>
+            </article>
+          </div>
+
+          <div class="news-col ai">
+            <div class="news-head">
+              <span class="news-eyebrow"><span class="news-dot ai"></span> Vendor &amp; model</span>
+              <span class="news-meta">Anthropic · OpenAI · Microsoft</span>
+            </div>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag">Partnership signal</span>
+                <span class="news-source"><strong>Anthropic + PwC</strong> · 14 May</span>
+              </div>
+              <div class="news-headline">PwC to train and certify 30,000 professionals on Claude — joint Centre of Excellence</div>
+              <div class="news-why">Certification-at-scale is the new bar. Worth a slide on what an enterprise CoE could look like for us.</div>
+            </article>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag">Platform · usable now</span>
+                <span class="news-source"><strong>Anthropic</strong> · 13 May</span>
+              </div>
+              <div class="news-headline">Claude for Small Business ships with one-click connectors for QuickBooks, HubSpot, Canva, Docusign, Google Workspace, M365</div>
+              <div class="news-why">Raises the floor on what business users now expect from any enterprise AI rollout. Watch the connector parity debate.</div>
+            </article>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag stat">Adoption reality</span>
+                <span class="news-source"><strong>Stackmatix / ALM Corp</strong> · 6d</span>
+              </div>
+              <div class="news-headline">Microsoft Copilot at 20M paid; 64% of F500 deployed but only 35.8% actually use it after access</div>
+              <div class="news-why">The adoption gap is the entire job. This is the headline for the Wave 3 narrative — we're not behind, the industry is.</div>
+            </article>
+
+            <article class="news-card">
+              <div class="news-row">
+                <span class="news-tag competitive">Capability decay</span>
+                <span class="news-source"><strong>Multiple analysts</strong> · ongoing</span>
+              </div>
+              <div class="news-headline">Half-life of AI skills now ~3–4 months — continuous enablement out-performs one-time training</div>
+              <div class="news-why">The AI Literacy programme cadence (quarterly cohorts) is correctly designed. Use this in the budget defence.</div>
+            </article>
+          </div>
+
+        </div>
+
+        <div class="news-disclaimer">
+          <strong>How this works.</strong> Every card here is a real published source as of <strong>21 May 2026</strong>. In production, <code>/morning-briefing</code> pulls fresh items via web search at 06:00, filtered to: <em>AI regulation, enterprise AI deployment research, vendor model + product launches (Anthropic / OpenAI / Microsoft / Google), and industry adoption benchmarks</em>. Every "why this matters" line is generated by cross-referencing the headline against this cockpit's active programmes register and decision queue.
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ RIGHT: Focus + Nudges ============ -->
+    <aside class="col">
+      <div class="col-header">
+        <div class="col-eyebrow">Don't forget <span class="count">· 6</span></div>
+        <button class="nudge-link">filter</button>
+      </div>
+
+      <div class="focus">
+        <div class="focus-eyebrow">Q2 priority · 39d left</div>
+        <div class="focus-line">Wave 3 to <em>70% weekly active</em> across 3,200 seats by 30 June.</div>
+        <div class="focus-stats">
+          <div><strong>38%</strong>current</div>
+          <div><strong>+32pts</strong>to target</div>
+          <div><strong>4</strong>weeks left</div>
+        </div>
+      </div>
+
+      <div class="nudges">
+
+        <div class="nudge theatre">
+          <div class="nudge-head">
+            <div class="nudge-tag">Planning theatre</div>
+            <div class="nudge-time">21d</div>
+          </div>
+          <div class="nudge-body">
+            <strong>Agentic Workflows Pilot</strong> has been in Diagnose for 21 days with no shipped artefact. Trigger the smallest-shippable-unit conversation with the COO sponsor before this becomes a Board question.
+          </div>
+          <div class="nudge-foot">
+            <button class="nudge-link">Book 15-min →</button>
+            <button class="nudge-link dismiss">Acknowledge</button>
+          </div>
+        </div>
+
+        <div class="nudge decision">
+          <div class="nudge-head">
+            <div class="nudge-tag">Decision overdue</div>
+            <div class="nudge-time">11d late</div>
+          </div>
+          <div class="nudge-body">
+            <strong>CISO</strong> owes a decision on the AI risk classification approach (single registry vs. distributed per-BU). Asked 10 May. <em>Without this, the 27 May Board pre-read can't finalise the classification standard.</em>
+          </div>
+          <div class="nudge-foot">
+            <button class="nudge-link">Slack chase →</button>
+            <button class="nudge-link">Escalate to CIO</button>
+          </div>
+        </div>
+
+        <div class="nudge dependency">
+          <div class="nudge-head">
+            <div class="nudge-tag">Dependency · wobbling</div>
+            <div class="nudge-time">last update 5d</div>
+          </div>
+          <div class="nudge-body">
+            <strong>Legal → AI Use Policy review</strong> due 28 May. Owner: J. Okonkwo. Status amber, no update in 5 days. Hits the Board pre-read window.
+          </div>
+          <div class="nudge-foot">
+            <button class="nudge-link">Check in →</button>
+            <button class="nudge-link dismiss">Watch</button>
+          </div>
+        </div>
+
+        <div class="nudge risk">
+          <div class="nudge-head">
+            <div class="nudge-tag">Adoption signal · sales</div>
+            <div class="nudge-time">wk 21</div>
+          </div>
+          <div class="nudge-body">
+            <strong>Sales BU adoption dropped 52% → 41%</strong> week-over-week. New SDR cohort just onboarded — likely cause. Plug into Wave 3 fast-track before the dip becomes a pattern.
+          </div>
+          <div class="nudge-foot">
+            <button class="nudge-link">Open BU view →</button>
+            <button class="nudge-link dismiss">Watch to next wk</button>
+          </div>
+        </div>
+
+        <div class="nudge champion">
+          <div class="nudge-head">
+            <div class="nudge-tag">Champion signal</div>
+            <div class="nudge-time">live</div>
+          </div>
+          <div class="nudge-body">
+            <strong>8 new champions joined this week.</strong> Top contributor: <strong>Sarah Patel (Operations)</strong> — 89 prompts last week, surfaced 2 new approved use cases. Feature in the next champions broadcast.
+          </div>
+          <div class="nudge-foot">
+            <button class="nudge-link">Draft feature →</button>
+            <button class="nudge-link dismiss">Note</button>
+          </div>
+        </div>
+
+        <div class="nudge signal">
+          <div class="nudge-head">
+            <div class="nudge-tag">Benefits realisation</div>
+            <div class="nudge-time">6mo review · 12d</div>
+          </div>
+          <div class="nudge-body">
+            <strong>AI Literacy cohort 12 · 6-month review due 2 June.</strong> Activity metrics strong (NPS 8.4, completion 87%). Now need the behaviour-change read — did productivity uplift hit the 90d target?
+          </div>
+          <div class="nudge-foot">
+            <button class="nudge-link">Pull data →</button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<div class="toast" id="toast">Board pre-read prompt sent to Cowork · open the side panel</div>
+
+<script>
+function copyPrompt() {
+  const prompt = `Draft the 27 May Board pre-read on AI governance, format SCR + Action Titles (each title ≤15 words, conclusion not topic). Pull from EU AI Act Article 4, our risk register, and the May ISO 42001 gap audit. Include:
+- Diagnosis · guiding policy · coherent action (one line each)
+- Classification framework — the 4 risk tiers, our 17 systems plotted
+- What the Board approves (the standard) vs what Ops applies (the systems)
+- AI Use Policy — Article 4 literacy obligation, training plan, attestation cadence
+- Cost of inaction — €15M / 3% turnover penalty exposure; reputational cost of public Article 4 failure
+- Single decision asked, with the next decision date if this one moves
+
+Close with the implication: missing 2 August = ineligible for public-sector AI tenders for 12 months.
+Audience: Board (8 directors, 3 non-exec). Pre-read sent 27 May 14:00, Board sits 28 May.
+State: Working draft (Director only). Not share-ready until Legal review (J. Okonkwo) + Mirror Test passed.`;
+
+  navigator.clipboard?.writeText(prompt).catch(() => {});
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+  });
+});
+document.querySelectorAll('.programme').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.programme').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+document.querySelectorAll('.mini-action').forEach(b => {
+  b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const t = document.getElementById('toast');
+    t.textContent = 'Prompt drafted · opening Cowork';
+    t.classList.add('show');
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.textContent = 'Board pre-read prompt sent to Cowork · open the side panel', 400);
+    }, 2200);
+  });
+});
+</script>
+
+</body>
+</html>
